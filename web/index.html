@@ -17,14 +17,16 @@ and open the template in the editor.
         <form>
             <input type="text" id="caja">
             <button type="button" id="botonbuscar" onclick="buttonSearch()">Search</button>
+            <h4>Region select</h4>
             <select id="selectregion">
-                <option value="Africa">Africa</option>
-                <option value="Americas">Americas</option>
-                <option value="Oceania">Oceania</option>
-                <option value="Europe">Europe</option>
-                <option value="Asia">Asia</option>
-        </select>  
+                <option value="Africa" onclick="selectRegion()">Africa</option>
+                <option value="Americas" onclick="selectRegion()">Americas</option>
+                <option value="Oceania" onclick="selectRegion()">Oceania</option>
+                <option value="Europe" onclick="selectRegion()">Europe</option>
+                <option value="Asia" onclick="selectRegion()">Asia</option>
+            </select>
         </form>
+        <br/>
         <table border="1" id="tablecountries">
             <thead>
                 <tr>
@@ -47,7 +49,36 @@ and open the template in the editor.
             });       
             
             function selectRegion(){
-                
+                var regiones = $("#selectregion").val();
+                console.log(regiones);
+                $.ajax({
+                   url: url,
+                   type: "GET",
+                   dataType: "json",
+                   success: function(data){       
+                       var html = "";
+                       $.each(data, function(position, country){
+                           //console.log(country);
+                           var name = country.name.common;
+                           var population = country.population;
+                           var capital = country.capital;
+                           var region = country.region;
+                           var flag = country.flags.png;
+                           var filter = "region:contains(" + region + ")";
+                           if(regiones.toLowerCase() === region.toLowerCase()){
+                                console.log("encontrado");
+                                html += "<tr>";
+                                html += "<td><img src='" + flag + "'/></td>";
+                                html += "<td>" + name + "</td>";
+                                html += "<td>" + population + "</td>";
+                                html += "<td>" + region + "</td>";
+                                html += "<td>" + capital + "</td>";
+                                html += "</tr>";      
+                            }
+                       });
+                       $("#tablecountries tbody").html(html);
+                   }                                    
+                });
             }
             
             function buttonSearch(){
@@ -56,7 +87,6 @@ and open the template in the editor.
             }
             
             function loadCountries(){
-                var request = "";
                 $.ajax({
                    url: url,
                    type: "GET",
